@@ -69,7 +69,7 @@ void Clab1View::OnDraw(CDC* pDC)
 	CBrush background(grey);
 	pDC->FillRect(rect, &background);
 
-	CPen* pen = pDC->SelectObject(new CPen(PS_SOLID | PS_GEOMETRIC, 5, yellow));
+	CPen* prevPen = pDC->SelectObject(new CPen(PS_SOLID | PS_GEOMETRIC, 5, yellow));
 	//narandzasti trougao
 	InscribedSolidTriangle(pDC, { base, (int)(5.5 * base) }, { 7 * base, (int)(5.5 * base) }, { 7 * base, (int)(11.5 * base) }, orange, 8);
 	//zeleni trougao
@@ -88,6 +88,8 @@ void Clab1View::OnDraw(CDC* pDC)
 	if (this->gridOn) {
 		Grid(pDC);
 	}
+
+	delete pDC->SelectObject(prevPen);
 }
 
 double Clab1View::GetDistance(POINT a, POINT b) {
@@ -167,23 +169,24 @@ void Clab1View::InscribedPolygon(CDC* pDC, POINT a, POINT b, POINT c, int n) {
 	double aLen = GetDistance(c, b);
 	double bLen = GetDistance(c, a);
 	double sum = cLen + bLen + aLen;
+	double s = sum / 2;
+	double r = sqrt(s * (s - aLen) * (s - bLen) * (s - cLen)) / s;
 
 	CPen* prevPen = pDC->GetCurrentPen();
 
 	LOGPEN logPen;
 	prevPen->GetLogPen(&logPen);
-	CPen newPen(logPen.lopnColor, 2, logPen.lopnColor);
+	CPen newPen(PS_SOLID | PS_GEOMETRIC, 3, logPen.lopnColor);
+
 	pDC->SelectObject(&newPen);
 	CBrush* prevBrush = (CBrush*)pDC->SelectStockObject(HOLLOW_BRUSH);
-
-	DrawRegularPolygon(pDC, (cLen * c.x + bLen * b.x + aLen * a.x) / sum + 0.5, (cLen * c.y + bLen * b.y + aLen * a.y) / sum + 0.5, max(max(cLen, aLen), bLen) / 9, n, 0);
-	
+	DrawRegularPolygon(pDC, (cLen * c.x + bLen * b.x + aLen * a.x) / sum + 0.5, (cLen * c.y + bLen * b.y + aLen * a.y) / sum + 0.5, r / 2, n, 0);
 	pDC->SelectObject(prevBrush);
 	pDC->SelectObject(prevPen);
 }
 
 void Clab1View::Grid(CDC* pDC) {
-	CPen newPen(PS_SOLID, 0, white);
+	CPen newPen(PS_SOLID | PS_GEOMETRIC, 2, gridGrey);
 	CPen* prevPen = pDC->SelectObject(&newPen);
 	int size = (gridLines - 1) * base;
 

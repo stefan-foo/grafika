@@ -21,6 +21,8 @@ protected: // create from serialization only
 	const COLORREF purple = RGB(153, 0, 204);
 	const COLORREF green = RGB(50, 205, 50);
 	const COLORREF red = RGB(255, 0, 0);
+	const COLORREF gridGrey = RGB(240, 240, 240);
+
 	const int gridLines = 21;
 	const int base = 50;
 
