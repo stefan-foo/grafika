@@ -69,21 +69,42 @@ void CIND17975View::OnDraw(CDC* pDC)
 	CBrush background(grey);
 	pDC->FillRect(rect, &background);
 
-	CPen* prevPen = pDC->SelectObject(new CPen(PS_SOLID, 5, yellow));
-	//narandzasti trougao
-	InscribedSolidTriangle(pDC, { base, (long)(5.5 * base) }, { 7 * base, (long)(5.5 * base) }, { 7 * base, (long)(11.5 * base) }, orange, 8);
-	//zeleni trougao
-	InscribedSolidTriangle(pDC, { 7 * base, (long)(5.5 * base) }, { 10 * base, (long)(8.5 * base) }, { 7 * base, (long)(8.5 * base) }, green, 4);
-	//roze kvadrat
-	Square(pDC, { 7 * base, (long)(8.5 * base) }, base * 3, pink);
+	CPen* prevPen = pDC->SelectObject(new CPen(PS_SOLID, 5, purple));
 	//crveni trougao
-	InscribedSolidTriangle(pDC, { 10 * base, (long)(8.5 * base) }, { 13 * base, (long)(5.5 * base) }, { 13 * base, (long)(11.5 * base) }, red, 6);
-	//zuti trougao
-	SolidTriangle(pDC, { 13 * base, (long)(5.5 * base) }, { 19 * base, (long)(5.5 * base) }, { 13 * base, (long)(11.5 * base) }, yellow);
-	//ljubicasti paralelogram
-	SolidQuadrilateral(pDC, { 10 * base, (long)(8.5 * base) }, { 13 * base, (long)(11.5 * base) }, { 13 * base, (long)(14.5 * base) }, { 10 * base, (long)(11.5 * base) }, purple);
+	InscribedSolidTriangle(pDC, 
+		{ base, long(13 * base) }, 
+		{ long(4.2 * base + 0.5), long(9.5 * base + 0.5) }, 
+		{ long(4.2 * base + 0.5), long(16.2 * base + 0.5) }, red, 6);
+	//narandzasti kvadrat
+	Square(pDC, 
+		{ long(4.2 * base + 0.5), long(9.5 * base + 0.5) }, 
+		long(base * 3.5 + 0.5), orange);
+	//zeleni trougao
+	InscribedSolidTriangle(pDC, 
+		{ long(7.6 * base + 0.5), long(9.5 * base + 0.5) }, 
+		{ long(7.6 * base + 0.5), long(16.2 * base + 0.5) }, 
+		{ long(14.2  * base + 0.5), long(9.5 * base + 0.5) }, green, 4);
+	//roze trougao
+	InscribedSolidTriangle(pDC, 
+		{ long(7.6 * base + 0.5), long(9.5 * base + 0.5) }, 
+		{ 17 * base, (long)(9.5 * base + 0.5)}, 
+		{ long(12.5 * base + 0.5), long(4.8 * base + 0.5) }, pink, 5);
+	//ljubicasti trougao
+	InscribedSolidTriangle(pDC, 
+		{ long(7.6 * base + 0.5), long(16.2 * base + 0.5) }, 
+		{ long(10 * base + 0.5), long(13.7 * base + 0.5) }, 
+		{ 10 * base, long(18.5 * base + 0.5) }, darkPurple, 7);
+	//zuti paralelogram
+	SolidQuadrilateral(pDC, 
+		{ long(12.5 * base + 0.5), long(4.8 * base + 0.5) }, 
+		{ long(15.7 * base + 0.5), long(4.8 * base + 0.5) }, 
+		{ long(18.9 * base + 0.5), long(1.5 * base + 0.5) }, 
+		{ long(15.7 * base + 0.5), long(1.5 * base + 0.5) }, yellow);
 	//srafirani trougao
-	InscribedHatchedTriangle(pDC, { 7 * base, (long)(11.5 * base) }, { 10 * base, (long)(11.5 * base) }, { 7 * base, (long)(14.5 * base) }, white, blue, HS_CROSS, 5);
+	InscribedHatchedTriangle(pDC, 
+		{ long(15.8 * base + 0.5), long(9.5 * base + 0.5) }, 
+		{ 19 * base, long(9.5 * base + 0.5) }, 
+		{ 19 * base, long(12.8 * base + 0.5) }, white, blue, HS_HORIZONTAL, 8);
 
 	if (this->gridOn) {
 		Grid(pDC);
@@ -168,10 +189,6 @@ void CIND17975View::InscribedPolygon(CDC* pDC, POINT a, POINT b, POINT c, int n)
 	double aLen = GetDistance(c, b);
 	double bLen = GetDistance(c, a);
 
-	double sum = cLen + bLen + aLen;
-	double s = sum / 2;
-	double r = sqrt(s * (s - aLen) * (s - bLen) * (s - cLen)) / s;
-
 	CPen* prevPen = pDC->GetCurrentPen();
 
 	LOGPEN logPen;
@@ -181,7 +198,11 @@ void CIND17975View::InscribedPolygon(CDC* pDC, POINT a, POINT b, POINT c, int n)
 	pDC->SelectObject(&newPen);
 	CBrush* prevBrush = (CBrush*)pDC->SelectStockObject(HOLLOW_BRUSH);
 
-	DrawRegularPolygon(pDC, (cLen * c.x + bLen * b.x + aLen * a.x) / sum + 0.5, (cLen * c.y + bLen * b.y + aLen * a.y) / sum + 0.5, r / 2, n, 0);
+	double sum = cLen + bLen + aLen;
+	double s = sum / 2;
+	double r = sqrt(s * (s - aLen) * (s - bLen) * (s - cLen)) / s;
+
+	DrawRegularPolygon(pDC, (cLen * c.x + bLen * b.x + aLen * a.x) / sum + 0.5, (cLen * c.y + bLen * b.y + aLen * a.y) / sum + 0.5, r / 2 * 1.1, n, 0);
 
 	pDC->SelectObject(prevBrush);
 	pDC->SelectObject(prevPen);

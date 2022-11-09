@@ -18,11 +18,11 @@ protected: // create from serialization only
 	const COLORREF yellow = RGB(255, 255, 0);
 	const COLORREF blue = RGB(104, 154, 255);
 	const COLORREF pink = RGB(255, 153, 204);
-	const COLORREF purple = RGB(153, 0, 204);
+	const COLORREF purple = RGB(255, 0, 255);
 	const COLORREF green = RGB(50, 205, 50);
 	const COLORREF red = RGB(255, 0, 0);
 	const COLORREF gridGrey = RGB(240, 240, 240);
-
+	const COLORREF darkPurple = RGB(153, 0, 204);
 	const int gridSize = 20;
 	const int base = 25;
 
