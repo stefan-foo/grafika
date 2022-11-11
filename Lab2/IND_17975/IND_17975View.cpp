@@ -106,80 +106,153 @@ void CIND17975View::Grid(CDC* pDC)
 
 void CIND17975View::DrawFigure(CDC* pDC)
 {
-	//osa rotacije
-	Translate(pDC, 10 * BASE, 17 * BASE);
+	constexpr double fcWidthFactor = 2.5;
+	constexpr double fcHeightFactor = 3;
+	constexpr double scWidthFactor = 1;
+	constexpr double scHeightFactor = 4;
+	constexpr double rcHeightFactor = 3;
+	constexpr double rcWidthFactor = 2;
+
+	POINT potJoin = { 10 * BASE, 17 * BASE };
+	POINT middleJoin = { 0, potJoin.y - BASE * fcHeightFactor };
+	POINT farRightJoin = {
+		middleJoin.x + sinf(RAD(45)) * BASE * scHeightFactor + rcHeightFactor * BASE,
+		middleJoin.y - cosf(RAD(45)) * BASE * scHeightFactor 
+	};
+	POINT farLeftJoin = {
+		middleJoin.x - sinf(RAD(45)) * BASE * scHeightFactor,
+		farRightJoin.y
+	};
+	POINT topLeftJoin = {
+		farLeftJoin.x,
+		farLeftJoin.y - rcHeightFactor * BASE
+	};
+
+	Translate(pDC, potJoin.x, potJoin.y);
 	Rotate(pDC, rootAngle);
-	//PRVA GRANA
-	Translate(pDC, -(LARGE.right / 2.0), -LARGE.bottom);
-	PlayEnhMetaFile(pDC->m_hDC, lightCactus, &LARGE);
-
-	//SREDNJA 
-	Translate(pDC, -((SMALL.right - LARGE.right) / 2.0), -SMALL.bottom);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &SMALL);
-
-	//SREDNJA LEVA
-	TRT(pDC, (SMALL.right / 2.0), SMALL.bottom, 45);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &SMALL);
-
-	//SREDNJA DESNA
-	TRT(pDC, (SMALL.right / 2.0), SMALL.bottom, -90);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &SMALL);
-
-	Translate(pDC, (SMALL.right / 2.0), 0);
-	Rotate(pDC, -45);
-	Translate(pDC, -(REGULAR.right / 2.0), -REGULAR.bottom);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
-
-	//DESNE GRANE
-	Translate(pDC, (REGULAR.right / 2.0), 0);
+	//koren
+	DrawCactucBMWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
+	Translate(pDC, -potJoin.x, -potJoin.y);
+	
+	//srednji spoj
+	Translate(pDC, middleJoin.x, middleJoin.y);
+	DrawCactucBMWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
 	Rotate(pDC, 45);
-	Translate(pDC, -(REGULAR.right / 2.0), -REGULAR.bottom);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
-
-	TRT(pDC, (REGULAR.right / 2.0), REGULAR.bottom, -90);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
-
-	Translate(pDC, REGULAR.right / 2.0, REGULAR.bottom);
-	//NORMALIZOVANJE OSA
-	Rotate(pDC, 135);
-
-	//LEVE GRANE
-	Translate(pDC, -(REGULAR.bottom + 2 * sinf(RAD(45)) * SMALL.bottom), 0);
-
+	DrawCactucBMWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
+	Rotate(pDC, -90);
+	DrawCactucBMWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
+	Rotate(pDC, 45);
+	Translate(pDC, -middleJoin.x, -middleJoin.y);
+	
+	//krajni desni spoj
+	Translate(pDC, farRightJoin.x, farRightJoin.y);
 	Rotate(pDC, 90);
-	Translate(pDC, -REGULAR.right / 2.0, -REGULAR.bottom);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
+	DrawCactucBMWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	Rotate(pDC, 135);
+	DrawCactucBMWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	Rotate(pDC, 90);
+	DrawCactucBMWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	Rotate(pDC, 45);
+	Translate(pDC, -farRightJoin.x, -farRightJoin.y);
 
-	TRT(pDC, REGULAR.right / 2.0, REGULAR.bottom, -90);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
+	//krajni levi spoj
+	Translate(pDC, farLeftJoin.x, farLeftJoin.y);
+	DrawCactucBMWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	Rotate(pDC, 90);
+	DrawCactucBMWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	Rotate(pDC, -90);
+	Translate(pDC, -farLeftJoin.x, -farLeftJoin.y);
 
-	Translate(pDC, -(LARGE.right - REGULAR.right) / 2.0, -LARGE.bottom);
-	PlayEnhMetaFile(pDC->m_hDC, darkCactus, &LARGE);
+	//levi iznad
+	Translate(pDC, topLeftJoin.x, topLeftJoin.y);
+	DrawCactucBMWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
 
-	//SPOJEVI
-	Translate(pDC, LARGE.right / 2.0, LARGE.bottom);
 	Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
-	Translate(pDC, 0, REGULAR.bottom);
-	Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
-	Translate(pDC, sinf(RAD(45)) * SMALL.bottom, cosf(RAD(45)) * SMALL.bottom);
-	Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
-	Translate(pDC, 0, LARGE.bottom);
-	Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
-	Translate(pDC, sinf(RAD(45)) * SMALL.bottom + REGULAR.bottom, -(SMALL.bottom * cosf(RAD(45)) + LARGE.bottom));
-	Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
-	Translate(pDC, -REGULAR.bottom, 0);
 
-	//DRUGA ROTIRAJUCA GRANA
-	Rotate(pDC, branchAngle);
-	Translate(pDC, -(REGULAR.right / 2.0), -REGULAR.bottom);
-	PlayEnhMetaFile(pDC->m_hDC, lightCactus, &REGULAR);
+	Translate(pDC, -topLeftJoin.x, -topLeftJoin.y);
 
-	Translate(pDC, (REGULAR.right / 2.0), REGULAR.bottom);
-	Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
+	//PlayEnhMetaFile(pDC->m_hDC, lightCactus, &LARGE);
+	//Scale(pDC, 1.0/LARGE.right, 1.0/LARGE.bottom);
+	// 
+	//SREDNJA 
+	//Translate(pDC, -((SMALL.right - LARGE.right) / 2.0), -SMALL.bottom);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &SMALL);
+
+	////SREDNJA LEVA
+	//TRT(pDC, (SMALL.right / 2.0), SMALL.bottom, 45);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &SMALL);
+
+	////SREDNJA DESNA
+	//TRT(pDC, (SMALL.right / 2.0), SMALL.bottom, -90);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &SMALL);
+
+	//Translate(pDC, (SMALL.right / 2.0), 0);
+	//Rotate(pDC, -45);
+	//Translate(pDC, -(REGULAR.right / 2.0), -REGULAR.bottom);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
+
+	////DESNE GRANE
+	//Translate(pDC, (REGULAR.right / 2.0), 0);
+	//Rotate(pDC, 45);
+	//Translate(pDC, -(REGULAR.right / 2.0), -REGULAR.bottom);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
+
+	//TRT(pDC, (REGULAR.right / 2.0), REGULAR.bottom, -90);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
+
+	//Translate(pDC, REGULAR.right / 2.0, REGULAR.bottom);
+	////NORMALIZOVANJE OSA
+	//Rotate(pDC, 135);
+
+	////LEVE GRANE
+	//Translate(pDC, -(REGULAR.bottom + 2 * sinf(RAD(45)) * SMALL.bottom), 0);
+
+	//Rotate(pDC, 90);
+	//Translate(pDC, -REGULAR.right / 2.0, -REGULAR.bottom);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
+
+	//TRT(pDC, REGULAR.right / 2.0, REGULAR.bottom, -90);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &REGULAR);
+
+	//Translate(pDC, -(LARGE.right - REGULAR.right) / 2.0, -LARGE.bottom);
+	//PlayEnhMetaFile(pDC->m_hDC, darkCactus, &LARGE);
+
+	////SPOJEVI
+	//Translate(pDC, LARGE.right / 2.0, LARGE.bottom);
+	//Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
+	//Translate(pDC, 0, REGULAR.bottom);
+	//Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
+	//Translate(pDC, sinf(RAD(45)) * SMALL.bottom, cosf(RAD(45)) * SMALL.bottom);
+	//Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
+	//Translate(pDC, 0, LARGE.bottom);
+	//Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
+	//Translate(pDC, sinf(RAD(45)) * SMALL.bottom + REGULAR.bottom, -(SMALL.bottom * cosf(RAD(45)) + LARGE.bottom));
+	//Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
+	//Translate(pDC, -REGULAR.bottom, 0);
+
+	////DRUGA ROTIRAJUCA GRANA
+	//Rotate(pDC, branchAngle);
+	//Translate(pDC, -(REGULAR.right / 2.0), -REGULAR.bottom);
+	//PlayEnhMetaFile(pDC->m_hDC, lightCactus, &REGULAR);
+
+	//Translate(pDC, (REGULAR.right / 2.0), REGULAR.bottom);
+	//Circle(pDC, 0, 0, BASE, BLACK, DARK_GREEN);
 
 	ModifyWorldTransform(pDC->m_hDC, NULL, MWT_IDENTITY);
 
 	DrawPot(pDC);
+}
+
+void CIND17975View::DrawCactusBM(CDC* pDC, HENHMETAFILE hmf) {
+	CRect rect(-(BASE / 2.0 + 0.5), 0, (BASE / 2.0 + 0.5), -BASE);
+	PlayEnhMetaFile(pDC->m_hDC, hmf, &rect);
+}
+
+void CIND17975View::DrawCactucBMWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY)
+{
+	Scale(pDC, sX, sY);
+	DrawCactusBM(pDC, hmf);
+	Scale(pDC, 1.0 / sX, 1.0 / sY);
 }
 
 void CIND17975View::DrawPot(CDC* pDC)
@@ -239,6 +312,11 @@ void CIND17975View::Circle(CDC* pDC, int cx, int cy, int r, COLORREF color, COLO
 
 	pDC->SelectObject(prevPen);
 	pDC->SelectObject(prevBrush);
+}
+
+void CIND17975View::Circle(CDC* pDC, POINT center, int r, COLORREF color, COLORREF fill)
+{
+	Circle(pDC, center.x, center.y, r, color, fill);
 }
 
 void CIND17975View::OnDraw(CDC* pDC)

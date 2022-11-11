@@ -52,8 +52,11 @@ private:
 	void Grid(CDC* pDC);
 	void DrawFigure(CDC* pDC);
 	void DrawPot(CDC* pDC);
+	void DrawCactusBM(CDC* pDC, HENHMETAFILE hmf);
+	void DrawCactucBMWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY);
 	void WriteText(CDC* pDC, CString text, POINT location);
 	void Circle(CDC* pDC, int cx, int cy, int r, COLORREF color, COLORREF fill);
+	inline void Circle(CDC* pDC, POINT center, int r, COLORREF color, COLORREF fill);
 // Overrides
 public:
 	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
