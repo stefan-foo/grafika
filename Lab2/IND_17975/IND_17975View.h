@@ -1,7 +1,6 @@
 
 // IND_17975View.h : interface of the CIND17975View class
 //
-
 #pragma once
 constexpr int BASE = 25;
 constexpr int GRID_SIZE = 20;
@@ -24,6 +23,13 @@ constexpr RECT REGULAR = { 0, 0, long(1.6 * BASE + 0.5), long(2.7 * BASE + 0.5) 
 constexpr RECT LARGE = { 0, 0, long(2.5 * BASE + 0.5), long(3 * BASE) };
 constexpr RECT SMALL = { 0, 0, long(BASE), long(3 * BASE)};
 
+constexpr double fcWidthFactor = 2.5;
+constexpr double fcHeightFactor = 3;
+constexpr double scWidthFactor = 1;
+constexpr double scHeightFactor = 3;
+constexpr double rcHeightFactor = 2.7;
+constexpr double rcWidthFactor = 1.6;
+
 class CIND17975View : public CView
 {
 protected: // create from serialization only
@@ -37,6 +43,14 @@ private:
 	HENHMETAFILE darkCactus;
 	int rootAngle = 0;
 	int branchAngle = 0;
+
+	POINT potJoin;
+	POINT middleJoin;
+	POINT rightJoin;
+	POINT farRightJoin;
+	POINT leftJoin;
+	POINT topLeftJoin;
+
 public:
 	CIND17975Doc* GetDocument() const;
 
