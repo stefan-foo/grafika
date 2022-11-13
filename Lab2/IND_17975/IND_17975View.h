@@ -2,32 +2,18 @@
 // IND_17975View.h : interface of the CIND17975View class
 //
 #pragma once
+#include "constants.h"
+
 constexpr int BASE = 25;
 constexpr int GRID_SIZE = 20;
 constexpr int GRID_LINES = 21;
 constexpr int GRID_LENGTH = BASE * GRID_SIZE;
 
-// Colors
-
-constexpr COLORREF TURQUOISE = RGB(135, 206, 235);
-constexpr COLORREF GRID = RGB(196, 231, 245);
-constexpr COLORREF POT_COLOR = RGB(222, 148, 0);
-constexpr COLORREF POT_EDGE = RGB(144, 96, 0);
-constexpr COLORREF DARK_GREEN = RGB(0, 204, 0);
-constexpr COLORREF LIGHT_GREEN = RGB(0, 255, 0);
-constexpr COLORREF BLACK = RGB(0, 0, 0);
-constexpr COLORREF WHITE = RGB(255, 255, 255);
-constexpr COLORREF TEXT_COLOR = RGB(255, 255, 0);
-
-constexpr RECT REGULAR = { 0, 0, long(1.6 * BASE + 0.5), long(2.7 * BASE + 0.5) };
-constexpr RECT LARGE = { 0, 0, long(2.5 * BASE + 0.5), long(3 * BASE) };
-constexpr RECT SMALL = { 0, 0, long(BASE), long(3 * BASE)};
-
 constexpr double fcWidthFactor = 2.5;
 constexpr double fcHeightFactor = 3;
-constexpr double scWidthFactor = 1;
+constexpr double scWidthFactor = 0.8;
 constexpr double scHeightFactor = 3;
-constexpr double rcHeightFactor = 2.7;
+constexpr double rcHeightFactor = 3;
 constexpr double rcWidthFactor = 1.6;
 
 class CIND17975View : public CView

@@ -65,6 +65,8 @@ CIND17975View::CIND17975View() noexcept
 
 CIND17975View::~CIND17975View()
 {
+	DeleteEnhMetaFile(lightCactus);
+	DeleteEnhMetaFile(darkCactus);
 }
 
 BOOL CIND17975View::PreCreateWindow(CREATESTRUCT& cs)
@@ -79,7 +81,7 @@ void CIND17975View::Translate(CDC* pDC, float dX, float dY, bool rightMultiply) 
 
 void CIND17975View::Scale(CDC* pDC, float sX, float sY, bool rightMultiply)
 {
-	XFORM xForm = { sX, 0, 0, sY, 0, 0 };
+	XFORM xForm = { sX, 0, 0, sY };
 	pDC->ModifyWorldTransform(&xForm, rightMultiply ? MWT_RIGHTMULTIPLY : MWT_LEFTMULTIPLY);
 }
 
@@ -87,7 +89,7 @@ void CIND17975View::Rotate(CDC* pDC, float angle, bool rightMultiply)
 {
 	float angleRad = RAD(angle);
 	float sinA = sinf(angleRad), cosA = cosf(angleRad);
-	XFORM xForm = { cosA, -sinA, sinA, cosA, 0, 0 };
+	XFORM xForm = { cosA, -sinA, sinA, cosA };
 	pDC->ModifyWorldTransform(&xForm, rightMultiply ? MWT_RIGHTMULTIPLY : MWT_LEFTMULTIPLY);
 }
 
@@ -125,12 +127,8 @@ void CIND17975View::Grid(CDC* pDC)
 
 void CIND17975View::DrawFigure(CDC* pDC)
 {
-	constexpr double fcWidthFactor = 2.5;
-	constexpr double fcHeightFactor = 3;
-	constexpr double scWidthFactor = 1;
-	constexpr double scHeightFactor = 3;
-	constexpr double rcHeightFactor = 2.7;
-	constexpr double rcWidthFactor = 1.6;
+	XFORM tForm;
+	pDC->GetWorldTransform(&tForm);
 
 	TRT(pDC, potJoin.x, potJoin.y, rootAngle);
 
@@ -167,7 +165,7 @@ void CIND17975View::DrawFigure(CDC* pDC)
 
 	//levi gore
 	Translate(pDC, topLeftJoin.x, topLeftJoin.y);
-	DrawCactucBMWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	DrawCactucBMWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
 	Translate(pDC, -topLeftJoin.x, -topLeftJoin.y);
 
 	Circle(pDC, topLeftJoin, BASE, BLACK, DARK_GREEN);
@@ -186,6 +184,8 @@ void CIND17975View::DrawFigure(CDC* pDC)
 	ModifyWorldTransform(pDC->m_hDC, NULL, MWT_IDENTITY);
 
 	DrawPot(pDC);
+
+	pDC->SetWorldTransform(&tForm);
 }
 
 void CIND17975View::DrawCactusBM(CDC* pDC, HENHMETAFILE hmf) {

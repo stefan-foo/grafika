@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="constants.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="IND_17975.h" />
     <ClInclude Include="IND_17975Doc.h" />
