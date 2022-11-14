@@ -34,6 +34,7 @@ BEGIN_MESSAGE_MAP(CIND17975View, CView)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
 	ON_WM_KEYDOWN()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 // CIND17975View construction/destruction
@@ -273,25 +274,40 @@ void CIND17975View::OnDraw(CDC* pDC)
 	if (!pDoc)
 		return;
 
+	CRect clientRect;
+	GetClientRect(&clientRect);
+
+	CDC* memDC = new CDC();
+	memDC->CreateCompatibleDC(pDC);
+	CBitmap memBM;
+	memBM.CreateCompatibleBitmap(pDC, clientRect.Width(), clientRect.Height());
+	memDC->SelectObject(&memBM);
+	memDC->Rectangle(clientRect);
+
 	CRect rect(0, 0, GRID_LENGTH, GRID_LENGTH);
 	CBrush background(TURQUOISE);
-	pDC->FillRect(rect, &background);
+	memDC->FillRect(rect, &background);
 
 	CRgn clipRgn;
 	clipRgn.CreateRectRgn(0, 0, rect.right, rect.bottom);
-	pDC->SelectClipRgn(&clipRgn);
+	memDC->SelectClipRgn(&clipRgn);
 
-	int prevGraphicsMode = pDC->SetGraphicsMode(GM_ADVANCED);
+	int prevGraphicsMode = memDC->SetGraphicsMode(GM_ADVANCED);
 
-	DrawFigure(pDC);
+	DrawFigure(memDC);
 
-	pDC->SetGraphicsMode(prevGraphicsMode);
+	memDC->SetGraphicsMode(prevGraphicsMode);
 
-	WriteText(pDC, L"17975 Stefan Stojadinovic", { GRID_LENGTH - BASE, BASE });
+	WriteText(memDC, L"17975 Stefan Stojadinovic", { GRID_LENGTH - BASE, BASE });
 
 	if (gridOn) {
-		Grid(pDC);
+		Grid(memDC);
 	}
+
+	pDC->BitBlt(0, 0, clientRect.Width(), clientRect.Height(), memDC, 0, 0, SRCCOPY);
+
+	memDC->DeleteDC();
+	delete memDC;
 }
 
 
@@ -360,4 +376,12 @@ void CIND17975View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	Invalidate();
 	CView::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+BOOL CIND17975View::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: Add your message handler code here and/or call default
+	return true;
+	//return CView::OnEraseBkgnd(pDC);
 }
