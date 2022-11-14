@@ -96,9 +96,18 @@ void CIND17975View::Rotate(CDC* pDC, float angle, bool rightMultiply)
 
 void CIND17975View::TRT(CDC* pDC, float dX, float dY, float angle, bool rightMultiply)
 {
-	Translate(pDC, dX, dY, rightMultiply);
-	Rotate(pDC, angle, rightMultiply);
-	Translate(pDC, -dX, -dY, rightMultiply);
+	if (rightMultiply) 
+	{
+		Translate(pDC, -dX, -dY, rightMultiply);
+		Rotate(pDC, angle, rightMultiply);
+		Translate(pDC, dX, dY, rightMultiply);
+	}
+	else 
+	{
+		Translate(pDC, dX, dY, rightMultiply);
+		Rotate(pDC, angle, rightMultiply);
+		Translate(pDC, -dX, -dY, rightMultiply);
+	}
 }
 
 void CIND17975View::Grid(CDC* pDC)
@@ -182,11 +191,11 @@ void CIND17975View::DrawFigure(CDC* pDC)
 
 	Circle(pDC, rightJoin, BASE, BLACK, DARK_GREEN);
 
-	ModifyWorldTransform(pDC->m_hDC, NULL, MWT_IDENTITY);
+	/*ModifyWorldTransform(pDC->m_hDC, NULL, MWT_IDENTITY);*/
+	pDC->SetWorldTransform(&tForm);
 
 	DrawPot(pDC);
 
-	pDC->SetWorldTransform(&tForm);
 }
 
 void CIND17975View::DrawCactusBM(CDC* pDC, HENHMETAFILE hmf) {
@@ -230,6 +239,7 @@ void CIND17975View::WriteText(CDC* pDC, CString text, POINT location)
 	LOGFONTW logFont {};
 	logFont.lfEscapement = -900;
 	logFont.lfHeight = 40;
+	logFont.lfOrientation = -900;
 
 	CFont font;
 	font.CreateFontIndirectW(&logFont);
@@ -294,15 +304,19 @@ void CIND17975View::OnDraw(CDC* pDC)
 
 	int prevGraphicsMode = memDC->SetGraphicsMode(GM_ADVANCED);
 
-	DrawFigure(memDC);
+	TRT(memDC, GRID_LENGTH / 2.0, GRID_LENGTH / 2.0, 90);
 
-	memDC->SetGraphicsMode(prevGraphicsMode);
+	DrawFigure(memDC);
 
 	WriteText(memDC, L"17975 Stefan Stojadinovic", { GRID_LENGTH - BASE, BASE });
 
 	if (gridOn) {
 		Grid(memDC);
 	}
+
+	memDC->ModifyWorldTransform(NULL, MWT_IDENTITY);
+
+	memDC->SetGraphicsMode(prevGraphicsMode);
 
 	pDC->BitBlt(0, 0, clientRect.Width(), clientRect.Height(), memDC, 0, 0, SRCCOPY);
 
