@@ -31,11 +31,12 @@ private:
 	int branchAngle = 0;
 
 	POINT potJoin;
-	POINT middleJoin;
+	POINT midJoin;
 	POINT rightJoin;
-	POINT farRightJoin;
-	POINT leftJoin;
-	POINT topLeftJoin;
+	POINT rightUJoin;
+	POINT rightRJoin;
+	POINT rightTJoin;
+	POINT rightDJoin;
 
 public:
 	CIND17975Doc* GetDocument() const;
