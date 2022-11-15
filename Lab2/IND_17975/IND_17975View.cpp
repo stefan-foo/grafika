@@ -94,20 +94,12 @@ void CIND17975View::Rotate(CDC* pDC, float angle, bool rightMultiply)
 	pDC->ModifyWorldTransform(&xForm, rightMultiply ? MWT_RIGHTMULTIPLY : MWT_LEFTMULTIPLY);
 }
 
-void CIND17975View::TRT(CDC* pDC, float dX, float dY, float angle, bool rightMultiply)
+void CIND17975View::RotateAround(CDC* pDC, float pivotX, float pivotY, float angle)
 {
-	if (rightMultiply) 
-	{
-		Translate(pDC, -dX, -dY, rightMultiply);
-		Rotate(pDC, angle, rightMultiply);
-		Translate(pDC, dX, dY, rightMultiply);
-	}
-	else 
-	{
-		Translate(pDC, dX, dY, rightMultiply);
-		Rotate(pDC, angle, rightMultiply);
-		Translate(pDC, -dX, -dY, rightMultiply);
-	}
+
+	Translate(pDC, pivotX, pivotY, false);
+	Rotate(pDC, angle, false);
+	Translate(pDC, -pivotX, -pivotY, false);
 }
 
 void CIND17975View::Grid(CDC* pDC)
@@ -140,42 +132,47 @@ void CIND17975View::DrawFigure(CDC* pDC)
 	XFORM tForm;
 	pDC->GetWorldTransform(&tForm);
 
-	TRT(pDC, potJoin.x, potJoin.y, rootAngle);
+	RotateAround(pDC, potJoin.x, potJoin.y, rootAngle);
 
 	//srednji spoj
 	Translate(pDC, middleJoin.x, middleJoin.y);
-	DrawCactucBCWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
+	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
 	Rotate(pDC, 45);
-	DrawCactucBCWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
+	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
 	Rotate(pDC, -90);
-	DrawCactucBCWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
+	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
 	Rotate(pDC, -135);
-	DrawCactucBCWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
+	DrawCactusWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
 	Rotate(pDC, 180);
 	Translate(pDC, -middleJoin.x, -middleJoin.y);
-	
+
+	//DrawBranch(pDC, darkCactus, middleJoin, scWidthFactor, scHeightFactor, 0);
+	//DrawBranch(pDC, darkCactus, middleJoin, scWidthFactor, scHeightFactor, 45);
+	//DrawBranch(pDC, darkCactus, middleJoin, scWidthFactor, scHeightFactor, -45);
+	//DrawBranch(pDC, darkCactus, middleJoin, fcWidthFactor, fcHeightFactor, 180);
+
 	//krajnji desni spoj
 	Translate(pDC, farRightJoin.x, farRightJoin.y);
 	Rotate(pDC, 90);
-	DrawCactucBCWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
 	Rotate(pDC, 135);
-	DrawCactucBCWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
 	Rotate(pDC, 90);
-	DrawCactucBCWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
 	Rotate(pDC, 45);
 	Translate(pDC, -farRightJoin.x, -farRightJoin.y);
 
 	//levi spoj
 	Translate(pDC, leftJoin.x, leftJoin.y);
-	DrawCactucBCWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
 	Rotate(pDC, 90);
-	DrawCactucBCWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
 	Rotate(pDC, -90);
 	Translate(pDC, -leftJoin.x, -leftJoin.y);
 
 	//levi gore
 	Translate(pDC, topLeftJoin.x, topLeftJoin.y);
-	DrawCactucBCWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
+	DrawCactusWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
 	Translate(pDC, -topLeftJoin.x, -topLeftJoin.y);
 
 	Circle(pDC, topLeftJoin, BASE, BLACK, DARK_GREEN);
@@ -186,7 +183,7 @@ void CIND17975View::DrawFigure(CDC* pDC)
 
 	Translate(pDC, rightJoin.x, rightJoin.y);
 	Rotate(pDC, branchAngle);
-	DrawCactucBCWS(pDC, lightCactus, rcWidthFactor, rcHeightFactor);
+	DrawCactusWS(pDC, lightCactus, rcWidthFactor, rcHeightFactor);
 	Translate(pDC, -rightJoin.x, -rightJoin.y);
 
 	Circle(pDC, rightJoin, BASE, BLACK, DARK_GREEN);
@@ -194,19 +191,38 @@ void CIND17975View::DrawFigure(CDC* pDC)
 	pDC->SetWorldTransform(&tForm);
 
 	DrawPot(pDC);
-
 }
 
-void CIND17975View::DrawCactusBC(CDC* pDC, HENHMETAFILE hmf) {
+void CIND17975View::DrawCactus(CDC* pDC, HENHMETAFILE hmf) {
 	CRect rect(-(BASE / 2.0 + 0.5), -BASE, BASE / 2.0 + 0.5, 0);
 	PlayEnhMetaFile(pDC->m_hDC, hmf, &rect);
 }
 
-void CIND17975View::DrawCactucBCWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY)
+void CIND17975View::DrawCactusWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY)
 {
 	Scale(pDC, sX, sY);
-	DrawCactusBC(pDC, hmf);
+	DrawCactus(pDC, hmf);
 	Scale(pDC, 1.0 / sX, 1.0 / sY);
+}
+
+void CIND17975View::DrawRotatedCactusWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY, float angle)
+{
+	Rotate(pDC, angle);
+	DrawCactusWS(pDC, hmf, sX, sY);
+	Rotate(pDC, -angle);
+}
+
+void CIND17975View::DrawBranch(CDC* pDC, HENHMETAFILE hmf, POINT origin, float sX, float sY, float angle)
+{
+	XFORM prevWT;
+	pDC->GetWorldTransform(&prevWT);
+
+	Translate(pDC, origin.x, origin.y);
+	Rotate(pDC, angle);
+	Scale(pDC, sX, sY);
+	PlayEnhMetaFile(pDC->GetSafeHdc(), hmf, CRect({ long(-ceil(BASE / 2.0)), -BASE}, POINT{long(ceil(BASE / 2.0)), 0}));
+
+	pDC->SetWorldTransform(&prevWT);
 }
 
 void CIND17975View::DrawPot(CDC* pDC)
@@ -301,7 +317,7 @@ void CIND17975View::OnDraw(CDC* pDC)
 
 	int prevGraphicsMode = memDC->SetGraphicsMode(GM_ADVANCED);
 
-	TRT(memDC, GRID_LENGTH / 2.0, GRID_LENGTH / 2.0, 90);
+	RotateAround(memDC, GRID_LENGTH / 2.0, GRID_LENGTH / 2.0, 90);
 	DrawFigure(memDC);
 	WriteText(memDC, L"17975 Stefan Stojadinovic", { GRID_LENGTH - BASE, BASE });
 

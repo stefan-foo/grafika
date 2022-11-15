@@ -16,6 +16,10 @@ constexpr double scHeightFactor = 3;
 constexpr double rcHeightFactor = 3;
 constexpr double rcWidthFactor = 1.6;
 
+SCALE regularC{ rcWidthFactor, rcHeightFactor };
+SCALE smallC{ scWidthFactor, scHeightFactor };
+SCALE largeC{ fcWidthFactor, fcHeightFactor };
+
 class CIND17975View : public CView
 {
 protected: // create from serialization only
@@ -36,7 +40,6 @@ private:
 	POINT farRightJoin;
 	POINT leftJoin;
 	POINT topLeftJoin;
-
 public:
 	CIND17975Doc* GetDocument() const;
 
@@ -47,13 +50,15 @@ private:
 	void Translate(CDC* pDC, float dX, float dY, bool rightMultiply = false);
 	void Scale(CDC* pDC, float sX, float sY, bool rightMultiply = false);
 	void Rotate(CDC* pDC, float angle, bool rightMultiply = false);
-	void TRT(CDC* pDC, float sX, float dX, float angle, bool rightMultiply = false);
+	void RotateAround(CDC* pDC, float sX, float dX, float angle);
 
 	void Grid(CDC* pDC);
 	void DrawFigure(CDC* pDC);
 	void DrawPot(CDC* pDC);
-	void DrawCactusBC(CDC* pDC, HENHMETAFILE hmf);
-	void DrawCactucBCWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY);
+	void DrawCactus(CDC* pDC, HENHMETAFILE hmf);
+	void DrawCactusWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY);
+	void DrawRotatedCactusWS(CDC* pDC, HENHMETAFILE hmf, float sX, float sY, float angle);
+	void DrawBranch(CDC* pDC, HENHMETAFILE hmf, POINT origin, float sX, float sY, float angle);
 	void WriteText(CDC* pDC, CString text, POINT location);
 	void Circle(CDC* pDC, int cx, int cy, int r, COLORREF color, COLORREF fill);
 	inline void Circle(CDC* pDC, POINT center, int r, COLORREF color, COLORREF fill);
