@@ -45,22 +45,26 @@ CIND17975View::CIND17975View() noexcept
 	lightCactus = GetEnhMetaFile(L"./cactus_part_light.emf");
 
 	potJoin = { 10 * BASE, 17 * BASE };
-	middleJoin = { potJoin.x, long(potJoin.y - BASE * fcHeightFactor) };
-	rightJoin = { 
-		long(middleJoin.x + sinf(RAD(45)) * BASE * scHeightFactor), 
-		long(middleJoin.y - cosf(RAD(45)) * BASE * scHeightFactor) 
+	midJoin = { potJoin.x, long(potJoin.y - BASE * fcHeightFactor) };
+	leftJoin = { 
+		long(midJoin.x - sinf(RAD(45)) * BASE * scHeightFactor), 
+		long(midJoin.y - cosf(RAD(45)) * BASE * scHeightFactor) 
 	};
-	farRightJoin = {
-		long(rightJoin.x + rcHeightFactor * BASE),
-		rightJoin.y
-	};
-	leftJoin = {
-		long(middleJoin.x - sinf(RAD(45)) * BASE * scHeightFactor),
-		farRightJoin.y
-	};
-	topLeftJoin = {
+	leftUJoin = {
 		leftJoin.x,
-		long(leftJoin.y - rcHeightFactor * BASE)
+		long(leftJoin.y - BASE * rcHeightFactor)
+	};
+	midUJoin = {
+		midJoin.x,
+		long(midJoin.y - BASE * scHeightFactor)
+	};
+	rightJoin = {
+		long(midJoin.x + sinf(RAD(45)) * BASE * scHeightFactor),
+		long(midJoin.y - cosf(RAD(45)) * BASE * scHeightFactor)
+	};
+	midUDJoin = {
+		long(midUJoin.x + sinf(RAD(45)) * BASE * rcHeightFactor),
+		long(midUJoin.y - cosf(RAD(45)) * BASE * rcHeightFactor)
 	};
 }
 
@@ -96,7 +100,6 @@ void CIND17975View::Rotate(CDC* pDC, float angle, bool rightMultiply)
 
 void CIND17975View::RotateAround(CDC* pDC, float pivotX, float pivotY, float angle)
 {
-
 	Translate(pDC, pivotX, pivotY, false);
 	Rotate(pDC, angle, false);
 	Translate(pDC, -pivotX, -pivotY, false);
@@ -132,61 +135,78 @@ void CIND17975View::DrawFigure(CDC* pDC)
 	XFORM tForm;
 	pDC->GetWorldTransform(&tForm);
 
-	RotateAround(pDC, potJoin.x, potJoin.y, rootAngle);
-
-	//srednji spoj
-	Translate(pDC, middleJoin.x, middleJoin.y);
-	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
-	Rotate(pDC, 45);
-	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
-	Rotate(pDC, -90);
-	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
-	Rotate(pDC, -135);
+	//iznad saksije
+	Translate(pDC, potJoin.x, potJoin.y);
 	DrawCactusWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
-	Rotate(pDC, 180);
-	Translate(pDC, -middleJoin.x, -middleJoin.y);
+	Translate(pDC, -potJoin.x, -potJoin.y);
+	
+	//desni spoj
+	Translate(pDC, rightJoin.x, rightJoin.y);
+	Rotate(pDC, -45);
+	DrawCactusWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
+	Rotate(pDC, -180);
+	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
+	Rotate(pDC, 225);
+	Circle(pDC, { 0, 0 }, BASE, BLACK, DARK_GREEN);
+	Translate(pDC, -rightJoin.x, -rightJoin.y);
 
-	//DrawBranch(pDC, darkCactus, middleJoin, scWidthFactor, scHeightFactor, 0);
-	//DrawBranch(pDC, darkCactus, middleJoin, scWidthFactor, scHeightFactor, 45);
-	//DrawBranch(pDC, darkCactus, middleJoin, scWidthFactor, scHeightFactor, -45);
-	//DrawBranch(pDC, darkCactus, middleJoin, fcWidthFactor, fcHeightFactor, 180);
+	//prva rotacija
+	{
+		RotateAround(pDC, midJoin.x, midJoin.y, rootAngle);
+		//spoj srednji gore
+		Translate(pDC, midUJoin.x, midUJoin.y);
+		Rotate(pDC, 45);
+		DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+		Rotate(pDC, -90);
+		DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
+		Rotate(pDC, -135);
+		DrawCactusWS(pDC, lightCactus, scWidthFactor, scHeightFactor);
+		Rotate(pDC, 180);
+		Circle(pDC, { 0, 0 }, BASE, BLACK, DARK_GREEN);
+		Translate(pDC, -midUJoin.x, -midUJoin.y);
+		//druga rotacija
+		{
+			RotateAround(pDC, midUDJoin.x, midUDJoin.y, branchAngle);
 
-	//krajnji desni spoj
-	Translate(pDC, farRightJoin.x, farRightJoin.y);
-	Rotate(pDC, 90);
-	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
-	Rotate(pDC, 135);
-	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
-	Rotate(pDC, 90);
-	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
-	Rotate(pDC, 45);
-	Translate(pDC, -farRightJoin.x, -farRightJoin.y);
+			Translate(pDC, midUDJoin.x, midUDJoin.y);
+			Rotate(pDC, -45);
+			DrawCactusWS(pDC, lightCactus, fcWidthFactor, fcHeightFactor);
+			Rotate(pDC, 45);
+			Circle(pDC, { 0, 0 }, BASE, BLACK, DARK_GREEN);
+			Translate(pDC, -midUDJoin.x, -midUDJoin.y);
 
-	//levi spoj
+			RotateAround(pDC, midUDJoin.x, midUDJoin.y, -branchAngle);
+		}
+
+		RotateAround(pDC, midJoin.x, midJoin.y, -rootAngle);
+	}
+
+	//spoj levo
 	Translate(pDC, leftJoin.x, leftJoin.y);
 	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
 	Rotate(pDC, 90);
 	DrawCactusWS(pDC, darkCactus, rcWidthFactor, rcHeightFactor);
-	Rotate(pDC, -90);
+	Rotate(pDC, 135);
+	DrawCactusWS(pDC, darkCactus, scWidthFactor, scHeightFactor);
+	Rotate(pDC, -225);
+	Circle(pDC, { 0, 0 }, BASE, BLACK, DARK_GREEN);
 	Translate(pDC, -leftJoin.x, -leftJoin.y);
 
-	//levi gore
-	Translate(pDC, topLeftJoin.x, topLeftJoin.y);
+	//spoj levo gore
+	Translate(pDC, leftUJoin.x, leftUJoin.y);
 	DrawCactusWS(pDC, darkCactus, fcWidthFactor, fcHeightFactor);
-	Translate(pDC, -topLeftJoin.x, -topLeftJoin.y);
+	Circle(pDC, { 0, 0 }, BASE, BLACK, DARK_GREEN);
+	Translate(pDC, -leftUJoin.x, -leftUJoin.y);
 
-	Circle(pDC, topLeftJoin, BASE, BLACK, DARK_GREEN);
-	Circle(pDC, leftJoin, BASE, BLACK, DARK_GREEN);
-	Circle(pDC, potJoin, BASE, BLACK, DARK_GREEN);
-	Circle(pDC, farRightJoin, BASE, BLACK, DARK_GREEN);
-	Circle(pDC, middleJoin, BASE, BLACK, DARK_GREEN);
+	//srednji spoj
+	Translate(pDC, midJoin.x, midJoin.y);
+	Circle(pDC, { 0, 0 }, BASE, BLACK, DARK_GREEN);
+	Translate(pDC, -midJoin.x, -midJoin.y);
 
-	Translate(pDC, rightJoin.x, rightJoin.y);
-	Rotate(pDC, branchAngle);
-	DrawCactusWS(pDC, lightCactus, rcWidthFactor, rcHeightFactor);
-	Translate(pDC, -rightJoin.x, -rightJoin.y);
-
-	Circle(pDC, rightJoin, BASE, BLACK, DARK_GREEN);
+	//saksija
+	Translate(pDC, potJoin.x, potJoin.y);
+	Circle(pDC, { 0, 0 }, BASE, BLACK, DARK_GREEN);
+	Translate(pDC, -potJoin.x, -potJoin.y);
 
 	pDC->SetWorldTransform(&tForm);
 
@@ -250,9 +270,9 @@ void CIND17975View::DrawPot(CDC* pDC)
 void CIND17975View::WriteText(CDC* pDC, CString text, POINT location)
 {
 	LOGFONTW logFont {};
-	logFont.lfEscapement = -900;
+	//logFont.lfEscapement = -900;
 	logFont.lfHeight = 40;
-	logFont.lfOrientation = -900;
+	//logFont.lfOrientation = -900;
 
 	CFont font;
 	font.CreateFontIndirectW(&logFont);
@@ -261,9 +281,9 @@ void CIND17975View::WriteText(CDC* pDC, CString text, POINT location)
 	COLORREF prevBk = pDC->SetBkMode(TRANSPARENT);
 	COLORREF prevTextColor = pDC->SetTextColor(BLACK);
 
-	pDC->TextOutW(location.x + 2, location.y + 2, text);
+	pDC->TextOutW(location.x - 3, location.y - 2, text);
 	pDC->SetTextColor(TEXT_COLOR);
-	pDC->TextOutW(location.x, location.y, text);
+	pDC->TextOutW(location.x - 5, location.y, text);
 
 	pDC->SelectObject(prevFont);
 	pDC->SetTextColor(prevTextColor);
@@ -317,9 +337,9 @@ void CIND17975View::OnDraw(CDC* pDC)
 
 	int prevGraphicsMode = memDC->SetGraphicsMode(GM_ADVANCED);
 
-	RotateAround(memDC, GRID_LENGTH / 2.0, GRID_LENGTH / 2.0, 90);
+	RotateAround(memDC, GRID_LENGTH / 2.0, GRID_LENGTH / 2.0, -90);
 	DrawFigure(memDC);
-	WriteText(memDC, L"17975 Stefan Stojadinovic", { GRID_LENGTH - BASE, BASE });
+	WriteText(memDC, L"17975 Stefan Stojadinovic", { BASE, BASE });
 
 	memDC->ModifyWorldTransform(NULL, MWT_IDENTITY);
 	memDC->SetGraphicsMode(prevGraphicsMode);

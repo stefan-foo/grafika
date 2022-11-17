@@ -16,10 +16,6 @@ constexpr double scHeightFactor = 3;
 constexpr double rcHeightFactor = 3;
 constexpr double rcWidthFactor = 1.6;
 
-SCALE regularC{ rcWidthFactor, rcHeightFactor };
-SCALE smallC{ scWidthFactor, scHeightFactor };
-SCALE largeC{ fcWidthFactor, fcHeightFactor };
-
 class CIND17975View : public CView
 {
 protected: // create from serialization only
@@ -35,11 +31,12 @@ private:
 	int branchAngle = 0;
 
 	POINT potJoin;
-	POINT middleJoin;
-	POINT rightJoin;
-	POINT farRightJoin;
+	POINT midJoin;
+	POINT midUJoin;
+	POINT midUDJoin;
 	POINT leftJoin;
-	POINT topLeftJoin;
+	POINT leftUJoin;
+	POINT rightJoin;
 public:
 	CIND17975Doc* GetDocument() const;
 
