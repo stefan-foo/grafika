@@ -2,14 +2,14 @@
 #include "CGLMaterial.h"
 
 #define	VAZA_BOJA_1 1.00, 0.00, 1.00
-#define VAZA_BOJA_1_A .25, 0, .25
-#define VAZA_BOJA_1_S .5, 0, .5
+#define VAZA_BOJA_1_A .25, 0.1, .25
+#define VAZA_BOJA_1_S .5, 0.1, .5
 
 #define VAZA_BOJA_2 0.00, 1.00, 1.00
-#define VAZA_BOJA_2_A 0, .25, .25
-#define VAZA_BOJA_2_S 0, .5, .5
+#define VAZA_BOJA_2_A 0.1, .25, .25
+#define VAZA_BOJA_2_S 0.1, .5, .5
 
-#define SVETLO_1 1.00, 0.00, 1.00
+#define SVETLO_1 1, 0.00, 1
 #define SVETLO_1_S 0.4, 0, 0.4
 #define SVETLO_1_A 0.3, 0, 0.3
 
@@ -63,10 +63,9 @@ public:
 
 	void DrawStand();
 	void DrawVase(bool showNormals = false);
-	void DrawWall(double h, int nSeg);
 	void DrawSide(double h, double w, int nSegH, int nSegW);
 	void DrawCube(double h, int nSeg);
-	void DrawCuboid(double h, double w, double d, int nSegH, int nSegW, int nSegD);
+	void DrawCuboid(double h, double w, double d, int nSegH, int nSegW, int nSegD, bool fOut = true);
 
 	void CalculateCameraPosition();
 	void ZoomView(bool direction);

@@ -28,19 +28,20 @@ CGLRenderer::CGLRenderer(void)
 	light3Mat.SetEmission(SVETLO_3, 1);
 	light3Mat.SetShininess(128);
 
-	vaseR1.SetAmbient(VAZA_BOJA_1_A, 1.0);
-	vaseR1.SetDiffuse(VAZA_BOJA_1, 1.0);
+	vaseR1.SetAmbient(VAZA_BOJA_1_A, 1);
+	vaseR1.SetDiffuse(VAZA_BOJA_1, 1);
 	vaseR1.SetSpecular(VAZA_BOJA_1_S, 1);
 
 	vaseR2.SetAmbient(VAZA_BOJA_2_A, 1.0);
 	vaseR2.SetDiffuse(VAZA_BOJA_2, 1.0);
 	vaseR2.SetSpecular(VAZA_BOJA_2_S, 1);
 
-	wall.SetAmbient(.3, .3, .3, 1);
-	wall.SetDiffuse(.6, .6, .6, 1);
-	wall.SetSpecular(.1, .1, .1, 1);
-	wall.SetEmission(0, 0, 0, 1);
-	wall.SetShininess(128);
+	//wall.SetAmbient(.3, .3, .3, 1);
+	//wall.SetDiffuse(.6, .6, .6, 1);
+	//wall.SetSpecular(.1, .1, .1, 1);
+
+	wall.SetAmbient(.65, .65, .65, 1);
+	wall.SetDiffuse(.65, .65, .65, 1);
 
 	stand.SetAmbient(.35, .35, .35, 1);
 	stand.SetDiffuse(.6, .6, .6, 1);
@@ -83,22 +84,19 @@ void CGLRenderer::PrepareScene(CDC* pDC)
 	wglMakeCurrent(pDC->m_hDC, m_hrc);
 	//---------------------------------
 	glClearColor(0.0, 0.0, 0.0, 1);
-	glEnable(GL_DEPTH_TEST);
 
-	GLfloat lm_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
+	GLfloat lm_ambient[] = { .3, .3, .3, 1.0 };
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lm_ambient);
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
-
-	GLfloat pos_ambient[] = {0.6, 0.6, 0.6, 1};
-	GLfloat pos_diffuse[] = { 0.6, 0.6, 0.6, 1 };
-	GLfloat pos_specular[] = { 0.1, 0.1, 0.1, 1 };
-	GLfloat pos_position[] = { 0, 1, 0, 0 };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, pos_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, pos_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, pos_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, pos_position);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	//glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);
 	
-	glEnable(GL_LIGHT0);
+	float light_ambient0[] = { .3, .3, .3, 1 };
+	float light_diffuse0[] = { .6, .6, .6, 1 };
+	float light_specular0[] = { .2, .2, .2, 1 };
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular0);
 
 	GLfloat light1_diffuse[] = { SVETLO_1, 1 };
 	GLfloat light1_specular[] = { SVETLO_1_S, 1 };
@@ -134,9 +132,15 @@ void CGLRenderer::DrawScene(CDC* pDC)
 	wglMakeCurrent(pDC->m_hDC, m_hrc);
 	//---------------------------------
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 	glLoadIdentity();
 
 	gluLookAt(camera[0], camera[1], camera[2], 0, 0, 0, 0, upY, 0);
+
+	float light_position[] = { -.5, 1, -.5, 0 };
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+	glEnable(GL_LIGHT0);
 
 	ConfigureLight(GL_LIGHT1, -30, 0, 0, 1, 0, 0, light1On);
 	ConfigureLight(GL_LIGHT2, 30, 0, 0, -1, 0, 0, light2On);
@@ -148,7 +152,7 @@ void CGLRenderer::DrawScene(CDC* pDC)
 
 	glPushMatrix();
 	{
-		DrawCube(60, 120);
+		DrawCube(60, 240);
 		glTranslated(0, -30, 0);
 		DrawStand();
 		glTranslated(0, 16, 0);
@@ -156,7 +160,7 @@ void CGLRenderer::DrawScene(CDC* pDC)
 	}
 	glPopMatrix();
 
-	glTranslated(0, -20, 0);
+	glTranslated(0, -30, 0);
 	DrawAxis(120);
 
 	glFlush();
@@ -420,27 +424,7 @@ void CGLRenderer::DrawVase(bool showNormals)
 		DrawCylinder(R_H, R_R2, R_R1, showNormals, vaseR1);
 		glTranslated(0, R_H, 0);
 	}
-}
-
-void CGLRenderer::DrawWall(double w, int nSeg)
-{
-	double segW = w / nSeg;
-
-	wall.Select(GL_FRONT);
-
-	glNormal3d(0, 0, 1);
-	glBegin(GL_QUADS);
-	{
-		for (double i = 0; i <= w - segW; i += segW) {
-			for (double j = 0; j <= w - segW; j += segW) {
-				glVertex3d(j, i, 0);
-				glVertex3d(j + segW, i, 0);
-				glVertex3d(j + segW, i + segW, 0);
-				glVertex3d(j, i + segW, 0);
-			}
-		}
-	}
-	glEnd();
+	glPopMatrix();
 }
 
 void CGLRenderer::DrawSide(double h, double w, int nSegH, int nSegW)
@@ -449,6 +433,7 @@ void CGLRenderer::DrawSide(double h, double w, int nSegH, int nSegW)
 	double segH = h / nSegH;
 
 	glNormal3d(0, 0, 1);
+
 	glBegin(GL_QUADS);
 	{
 		for (double i = 0; i < h; i += segH) {
@@ -461,118 +446,131 @@ void CGLRenderer::DrawSide(double h, double w, int nSegH, int nSegW)
 		}
 	}
 	glEnd();
+
+	//glDisable(GL_LIGHTING);
+	//glBegin(GL_LINES);
+	//{
+	//	glColor3d(0, 1, 0);
+	//	glLineWidth(10);
+	//	glVertex3d(w / 2, h / 2, 0);
+	//	glVertex3d(w / 2, h / 2, 1);
+	//}
+	//glEnd();
+	//glEnable(GL_LIGHTING);
 }
 
 void CGLRenderer::DrawCube(double w, int nSeg)
 {
 	glEnable(GL_CULL_FACE);
+	
+	wall.Select(GL_FRONT_AND_BACK);
 
 	glPushMatrix();
 	{
 		glTranslated(-w / 2, -w / 2, -w / 2);
+		DrawSide(w, w, nSeg, nSeg);
+	}
+	glPopMatrix();
 
-		glPushMatrix();
-		{
-			DrawWall(w, nSeg);
+	glPushMatrix();
+	{
+		glTranslated(w / 2, -w / 2, - w / 2);
+		glRotated(-90, 0, 1, 0);
+		DrawSide(w, w, nSeg, nSeg);
+	}
+	glPopMatrix();
 
-			glPushMatrix();
-			{
-				glRotated(90, 0, 1, 0);
-				glTranslated(-w, 0, 0);
-				DrawWall(w, nSeg);
-			}
-			glPopMatrix();
+	// po Z osi +
+	glPushMatrix();
+	{
+		glTranslated(w / 2, -w / 2, w / 2);
+		glRotated(-180, 0, 1, 0);
+		DrawSide(w, w, nSeg, nSeg);
+	}
+	glPopMatrix();
 
-			glPushMatrix();
-			{
-				glRotated(-90, 0, 1, 0);
-				glTranslated(0, 0, -w);
-				DrawWall(w, nSeg);
-			}
-			glPopMatrix();
+	// po X osi -
+	glPushMatrix();
+	{
+		glTranslated(-w / 2, -w / 2, w / 2);
+		glRotated(90, 0, 1, 0);
+		DrawSide(w, w, nSeg, nSeg);
+	}
+	glPopMatrix();
 
-			glPushMatrix();
-			{
-				glRotated(180, 0, 1, 0);
-				glTranslated(-w, 0, -w);
-				DrawWall(w, nSeg);
-			}
-			glPopMatrix();
+	// po Y osi -
+	glPushMatrix();
+	{
+		glTranslated(-w / 2, -w / 2, w / 2);
+		glRotated(-90, 1, 0, 0);
+		DrawSide(w, w, nSeg, nSeg);
+	}
+	glPopMatrix();
 
-			glPushMatrix();
-			{
-				glRotated(90, 1, 0, 0);
-				glTranslated(0, 0, -w);
-				DrawWall(w, nSeg);
-			}
-			glPopMatrix();
-
-			glPushMatrix();
-			{
-				glRotated(-90, 1, 0, 0);
-				glTranslated(0, -w, 0);
-				DrawWall(w, nSeg);
-			}
-			glPopMatrix();
-		}
-		glPopMatrix();
+	// po Y osi +
+	glPushMatrix();
+	{
+		glTranslated(-w / 2, w / 2, -w / 2);
+		glRotated(90, 1, 0, 0);
+		DrawSide(w, w, nSeg, nSeg);
 	}
 	glPopMatrix();
 
 	glDisable(GL_CULL_FACE);
 }
 
-void CGLRenderer::DrawCuboid(double h, double w, double d, int nSegH, int nSegW, int nSegD)
+void CGLRenderer::DrawCuboid(double h, double w, double d, int nSegH, int nSegW, int nSegD, bool /*fOut*/)
 {
-	// prednja
+	// Z +
 	glPushMatrix();
 	{
-		glTranslated(-w / 2, 0, d / 2);
+		glTranslated(- w / 2, 0, w / 2);
 		DrawSide(h, w, nSegH, nSegW);
 	}
 	glPopMatrix();
 
-	// zadnja
+	// Z -
 	glPushMatrix();
 	{
+		glTranslated(w / 2, 0, -w / 2);
 		glRotated(180, 0, 1, 0);
-		glTranslated(-w / 2, 0, d / 2);
 		DrawSide(h, w, nSegH, nSegW);
 	}
 	glPopMatrix();
 
-	// gornja
+	// X +
 	glPushMatrix();
 	{
-		glRotated(90, 1, 0, 0);
-		glTranslated(-w / 2, -d / 2, - h);
-		DrawSide(w, d, nSegH, nSegW);
-	}
-	glPopMatrix();
-
-	// donja
-	glPushMatrix();
-	{
-		glRotated(90, 1, 0, 0);
-		glTranslated(-w / 2, -d / 2, 0);
-		DrawSide(w, d, nSegH, nSegW);
-	}
-	glPopMatrix();
-
-	//leva
-	glPushMatrix();
-	{
+		glTranslated(w / 2, 0, w / 2);
 		glRotated(90, 0, 1, 0);
-		glTranslated(-d / 2, 0, - w/ 2);
-		DrawSide(h, d, nSegH, nSegW);
+		DrawSide(h, w, nSegH, nSegW);
 	}
 	glPopMatrix();
-	//desna
+
+	// x -
 	glPushMatrix();
 	{
+		glTranslated(-w / 2, 0, -w / 2);
 		glRotated(-90, 0, 1, 0);
-		glTranslated(-d / 2, 0, -w / 2);
-		DrawSide(h, d, nSegH, nSegW);
+		DrawSide(h, w, nSegH, nSegW);
+	}
+	glPopMatrix();
+
+	// y +
+	glPushMatrix();
+	{
+		glTranslated(-w / 2, h, w / 2);
+		glRotated(-90, 1, 0, 0);
+		DrawSide(w, d, nSegH, nSegD);
+	}
+	glPopMatrix();
+
+	// y -
+	glPushMatrix();
+	{
+		glTranslated(-w / 2, 0, -w / 2);
+		glRotated(90, 1, 0, 0);
+		DrawSide(w, d, nSegH, nSegD);
 	}
 	glPopMatrix();
 }
