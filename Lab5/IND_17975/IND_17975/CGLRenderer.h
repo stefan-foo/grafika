@@ -11,12 +11,15 @@
 
 #define SVETLO_1 1.00, 0.00, 1.00
 #define SVETLO_1_S 0.4, 0, 0.4
+#define SVETLO_1_A 0.3, 0, 0.3
 
 #define SVETLO_2 1.00, 0.00, 0.00
 #define SVETLO_2_S 0.4, 0, 0
+#define SVETLO_2_A 0.3, 0, 0
 
 #define SVETLO_3 0.00, 0.00, 1.00
 #define SVETLO_3_S 0, 0, 0.4
+#define SVETLO_3_A 0, 0, 0.1
 
 #define GRID 1.0, 0, 0
 
@@ -74,7 +77,7 @@ public:
 protected:
 	HGLRC	 m_hrc; //OpenGL Rendering Context 
 private:
-	CGLMaterial vaseR1, vaseR2, light1Mat, light2Mat, light3Mat, table, wall;
+	CGLMaterial vaseR1, vaseR2, light1Mat, light2Mat, light3Mat, table, wall, stand;
 
 	double cameraR = 40;
 	double vAlpha = 30;

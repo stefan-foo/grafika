@@ -36,9 +36,15 @@ CGLRenderer::CGLRenderer(void)
 	vaseR2.SetDiffuse(VAZA_BOJA_2, 1.0);
 	vaseR2.SetSpecular(VAZA_BOJA_2_S, 1);
 
-	wall.SetAmbient(.2, .2, .2, 1);
+	wall.SetAmbient(.3, .3, .3, 1);
 	wall.SetDiffuse(.6, .6, .6, 1);
+	wall.SetSpecular(.1, .1, .1, 1);
 	wall.SetEmission(0, 0, 0, 1);
+	wall.SetShininess(128);
+
+	stand.SetAmbient(.35, .35, .35, 1);
+	stand.SetDiffuse(.6, .6, .6, 1);
+	stand.SetEmission(0, 0, 0, 1);
 }
 
 CGLRenderer::~CGLRenderer(void)
@@ -79,36 +85,41 @@ void CGLRenderer::PrepareScene(CDC* pDC)
 	glClearColor(0.0, 0.0, 0.0, 1);
 	glEnable(GL_DEPTH_TEST);
 
-	GLfloat lm_ambient[] = { 0.8, 0.8, 0.8, 1.0 };
+	GLfloat lm_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lm_ambient);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
 
-	GLfloat light_ambient[] = {0.6, 0.6, 0.6, 1.0};
-
-	GLfloat light0_diffuse[] = { 0.4, 0.4, 0.4, 0 };
-	GLfloat light0_specular[] = { 0.1, 0.1, 0.1, 0 };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180);
+	GLfloat pos_ambient[] = {0.6, 0.6, 0.6, 1};
+	GLfloat pos_diffuse[] = { 0.6, 0.6, 0.6, 1 };
+	GLfloat pos_specular[] = { 0.1, 0.1, 0.1, 1 };
+	GLfloat pos_position[] = { 0, 1, 0, 0 };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, pos_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, pos_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, pos_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, pos_position);
+	
+	glEnable(GL_LIGHT0);
 
 	GLfloat light1_diffuse[] = { SVETLO_1, 1 };
 	GLfloat light1_specular[] = { SVETLO_1_S, 1 };
-	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+	GLfloat light1_ambient[] = { SVETLO_1_A, 1 };
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
 	glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 25);
 
 	GLfloat light2_diffuse[] = { SVETLO_2, 1 };
 	GLfloat light2_specular[] = { SVETLO_2_S, 1 };
-	glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
+	GLfloat light2_ambient[] = { SVETLO_2_A, 1 };
+	glLightfv(GL_LIGHT2, GL_AMBIENT, light2_ambient);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, light2_diffuse);
 	glLightfv(GL_LIGHT2, GL_SPECULAR, light2_specular);
 	glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, 25);
 
 	GLfloat light3_diffuse[] = { SVETLO_3, 1 };
 	GLfloat light3_specular[] = { SVETLO_3_S, 1 };
-	glLightfv(GL_LIGHT3, GL_AMBIENT, light_ambient);
+	GLfloat light3_ambient[] = { SVETLO_2_A, 1 };
+	glLightfv(GL_LIGHT3, GL_AMBIENT, light3_ambient);
 	glLightfv(GL_LIGHT3, GL_DIFFUSE, light3_diffuse);
 	glLightfv(GL_LIGHT3, GL_SPECULAR, light3_specular);
 	glLightf(GL_LIGHT3, GL_SPOT_CUTOFF, 25);
@@ -127,26 +138,26 @@ void CGLRenderer::DrawScene(CDC* pDC)
 
 	gluLookAt(camera[0], camera[1], camera[2], 0, 0, 0, 0, upY, 0);
 
-	ConfigureLight(GL_LIGHT0, 0, 20, 0, 0, -1, 0, true);
-	DrawLight(-20, 0, 0, 1, light1Mat, light1On);
-	ConfigureLight(GL_LIGHT1, -20, 0, 0, 1, 0, 0, light1On);
-	DrawLight(20, 0, 0, 1, light2Mat, light2On);
-	ConfigureLight(GL_LIGHT2, 20, 0, 0, -1, 0, 0, light2On);
-	DrawLight(0, 20, 0, 1, light3Mat, light3On);
-	ConfigureLight(GL_LIGHT3, 0, 20, 0, 0, -1, 0, light3On);
+	ConfigureLight(GL_LIGHT1, -30, 0, 0, 1, 0, 0, light1On);
+	ConfigureLight(GL_LIGHT2, 30, 0, 0, -1, 0, 0, light2On);
+	ConfigureLight(GL_LIGHT3, 0, 30, 0, 0, -1, 0, light3On);
+
+	DrawLight(-30, 0, 0, 1, light1Mat, light1On);
+	DrawLight(30, 0, 0, 1, light2Mat, light2On);
+	DrawLight(0, 30, 0, 1, light3Mat, light3On);
 
 	glPushMatrix();
 	{
-		DrawCube(40, 100);
-		glTranslated(0, -20, 0);
+		DrawCube(60, 120);
+		glTranslated(0, -30, 0);
 		DrawStand();
-		glTranslated(0, 12, 0);
+		glTranslated(0, 16, 0);
 		DrawVase(normalsOn);
 	}
 	glPopMatrix();
 
 	glTranslated(0, -20, 0);
-	DrawAxis(50);
+	DrawAxis(120);
 
 	glFlush();
 	//---------------------------------
@@ -161,7 +172,7 @@ void CGLRenderer::Reshape(CDC* pDC, int w, int h)
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(40, (double)w / (double)h, 1, 100);
+	gluPerspective(40, (double)w / (double)h, 1, 150);
 	glMatrixMode(GL_MODELVIEW);
 	//---------------------------------
 	wglMakeCurrent(NULL, NULL);
@@ -359,12 +370,12 @@ void CGLRenderer::ConfigureLight(GLenum light, double posX, double posY, double 
 
 void CGLRenderer::DrawStand()
 {
-	wall.Select(GL_FRONT);
+	stand.Select(GL_FRONT_AND_BACK);
 
 	glPushMatrix();
 		DrawSphere(6, 40, 40);
-		DrawCylinder(10, 3, 3, false, wall, 8, true);
-		glTranslated(0, 10, 0);
+		DrawCylinder(14, 3, 3, false, stand, 8, true);
+		glTranslated(0, 14, 0);
 
 		DrawCuboid(2, 15, 15, 2, 15, 15);
 	glPopMatrix();
