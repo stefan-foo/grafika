@@ -85,33 +85,51 @@ void CKOL112View::DrawScene(CDC* pDC)
 {
 	int prevMode = pDC->SetGraphicsMode(GM_ADVANCED);
 
-	Translate(pDC, 300, 300);
+	//Translate(pDC, 300, 300);
 
 	XFORM saveT;
 	pDC->GetWorldTransform(&saveT);
 
-	int spokeCount = 20, spokeWidth = 20;
-	float r1 = 1.4 * 1.5 * spokeCount * spokeWidth / (2 * M_PI);
-	Rotate(pDC, -angle);
-	DrawGear(pDC, spokeCount, spokeWidth);
+	pDC->Rectangle(100, 100, 400, 300);
 
+	//Translate()
+
+	pDC->GetWorldTransform(&saveT);
+
+	Translate(pDC, 0, -0.2 * 100);
+	Shear(pDC, 0, -0.5);
+	pDC->Rectangle(100, 100, 140, 200);
 	pDC->SetWorldTransform(&saveT);
 
-	spokeCount = 10, spokeWidth = 20;
-	float r2 = 1.4 * 1.5 * spokeCount * spokeWidth / (2 * M_PI);
-	Rotate(pDC, 135);
-	Translate(pDC, r1 + r2, 0);
-	Rotate(pDC, -127 + angle * 2);
-	DrawGear(pDC, spokeCount, spokeWidth);
+	pDC->Rectangle(140, 100 + 0.2 * 40, 180, 200 + 0.2 * 40);
 	
-	pDC->SetWorldTransform(&saveT);
+	//int spokeCount = 20, spokeWidth = 20;
+	//float r1 = 1.4 * 1.5 * spokeCount * spokeWidth / (2 * M_PI);
+	//Rotate(pDC, -angle);
+	//DrawGear(pDC, spokeCount, spokeWidth);
 
-	Translate(pDC, r1 + r2, 0);
-	Rotate(pDC, angle * 2);
-	DrawGear(pDC, spokeCount, spokeWidth);
+	//pDC->SetWorldTransform(&saveT);
+
+	//spokeCount = 10, spokeWidth = 20;
+	//float r2 = 1.4 * 1.5 * spokeCount * spokeWidth / (2 * M_PI);
+	//Rotate(pDC, 135);
+	//Translate(pDC, r1 + r2, 0);
+	//Rotate(pDC, -127 + angle * 2);
+	//DrawGear(pDC, spokeCount, spokeWidth);
+	//
+	//pDC->SetWorldTransform(&saveT);
+
+	//Translate(pDC, r1 + r2, 0);
+	//Rotate(pDC, angle * 2);
+	//DrawGear(pDC, spokeCount, spokeWidth);
 
 	pDC->ModifyWorldTransform(NULL, MWT_IDENTITY);
 	pDC->SetGraphicsMode(prevMode);
+}
+
+void CKOL112View::Shear(CDC* pDC, float sX, float sY) {
+	XFORM x = { 1, sX, sY, 1 };
+	pDC->ModifyWorldTransform(&x, MWT_LEFTMULTIPLY);
 }
 
 void CKOL112View::DrawGear(CDC* pDC, int spokeCount, int spokeWidth)
@@ -153,6 +171,7 @@ void CKOL112View::DrawGear(CDC* pDC, int spokeCount, int spokeWidth)
 	logFont.lfHeight = 18;
 	wcscpy_s(logFont.lfFaceName, 32, L"Times New Roman");
 	CFont font;
+	//font.CreateFontW()
 	font.CreateFontIndirectW(&logFont);
 	pDC->SelectObject(&font);
 

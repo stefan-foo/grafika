@@ -16,7 +16,7 @@ protected: // create from serialization only
 	float angle = 0;
 public:
 	CKOL112Doc* GetDocument() const;
-
+	
 // Operations
 public:
 
@@ -27,7 +27,7 @@ public:
 protected:
 	void Translate(CDC* pDC, float x, float y);
 	void Rotate(CDC* pDC, float angle);
-
+	void Shear(CDC* pDC, float sX, float sY);
 	void Trapez(CDC* pDC, int a, int b, int h);
 	void DrawScene(CDC* pDC);
 	void DrawGear(CDC* pDC, int spokeCount, int spokeWidth);
